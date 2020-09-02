@@ -1,13 +1,13 @@
 <div align="center">
    <h1>🔥 setup-firebase</h1>
-   <p>Setup firebase-tools CLI</p>
+   <p>Setup firebase-tools CLI for multiple steps</p>
 </div>
 
 ## 🧠 Why
 
-There is an excellent function already: [firebase-action](https://github.com/w9jds/firebase-action), but it forces you to run a command in order to work.
+There is an excellent action already: [firebase-action](https://github.com/w9jds/firebase-action), but it forces you to run a command in order to work.
 
-With this one you just put the function at the start and use the firebase-tools CLI from any part of your code (npm script, shell...)
+With this one, after running the action you can use the firebase-tools CLI from anywhere: npm script, shell...
 
 ## 🚀 Usage
 
