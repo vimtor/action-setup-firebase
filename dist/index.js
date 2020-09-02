@@ -1,11 +1,11 @@
 require('./sourcemap-register.js');module.exports =
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -35,20 +35,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
 const exec = __importStar(__webpack_require__(514));
+const command_exists_1 = __importDefault(__webpack_require__(569));
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     core.info(` Available environment variables:\n -> ${Object.keys(process.env)
         .map(i => `${i} :: ${process.env[i]}`)
         .join('\n -> ')}`);
     core.info('Setting input and environment variables');
     const token = core.getInput('firebase-token');
+    const os = process.env.RUNNER_OS;
     if (!token) {
         throw new Error('Missing mandatory input: firebase-token');
     }
-    yield exec.exec('export', [`FIREBASE_TOKEN=${token}`]);
-    yield exec.exec('npm', ['install', '-g', 'firebase-tools']);
+    core.exportVariable('FIREBASE_TOKEN', token);
+    if (yield command_exists_1.default('npm')) {
+        yield exec.exec('npm', ['install', '-g', 'firebase-tools']);
+    }
+    else if (os === 'Linux') {
+        yield exec.exec('curl', ['-sL', 'https://firebase.tools', '|', 'bash']);
+    }
+    else {
+        throw new Error('On windows you need to setup node before');
+    }
 });
 run()
     .then(() => core.info('Updated files version successfully'))
@@ -60,6 +73,7 @@ run()
 /***/ 351:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
@@ -158,6 +172,7 @@ function escapeProperty(s) {
 /***/ 186:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -386,6 +401,7 @@ exports.getState = getState;
 /***/ 514:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -436,6 +452,7 @@ exports.exec = exec;
 /***/ 159:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1042,6 +1059,7 @@ class ExecState extends events.EventEmitter {
 /***/ 962:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1243,6 +1261,7 @@ function isUnixExecutable(stats) {
 /***/ 436:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1536,9 +1555,183 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
+/***/ 569:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__(325);
+
+
+/***/ }),
+
+/***/ 325:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var exec = __webpack_require__(129).exec;
+var execSync = __webpack_require__(129).execSync;
+var fs = __webpack_require__(747);
+var path = __webpack_require__(622);
+var access = fs.access;
+var accessSync = fs.accessSync;
+var constants = fs.constants || fs;
+
+var isUsingWindows = process.platform == 'win32'
+
+var fileNotExists = function(commandName, callback){
+    access(commandName, constants.F_OK,
+    function(err){
+        callback(!err);
+    });
+};
+
+var fileNotExistsSync = function(commandName){
+    try{
+        accessSync(commandName, constants.F_OK);
+        return false;
+    }catch(e){
+        return true;
+    }
+};
+
+var localExecutable = function(commandName, callback){
+    access(commandName, constants.F_OK | constants.X_OK,
+        function(err){
+        callback(null, !err);
+    });
+};
+
+var localExecutableSync = function(commandName){
+    try{
+        accessSync(commandName, constants.F_OK | constants.X_OK);
+        return true;
+    }catch(e){
+        return false;
+    }
+}
+
+var commandExistsUnix = function(commandName, cleanedCommandName, callback) {
+
+    fileNotExists(commandName, function(isFile){
+
+        if(!isFile){
+            var child = exec('command -v ' + cleanedCommandName +
+                  ' 2>/dev/null' +
+                  ' && { echo >&1 ' + cleanedCommandName + '; exit 0; }',
+                  function (error, stdout, stderr) {
+                      callback(null, !!stdout);
+                  });
+            return;
+        }
+
+        localExecutable(commandName, callback);
+    });
+
+}
+
+var commandExistsWindows = function(commandName, cleanedCommandName, callback) {
+  // Regex from Julio from: https://stackoverflow.com/questions/51494579/regex-windows-path-validator
+  if (!(/^(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:"\|\?\*\n])+(?:\/\/|\/|\\\\|\\)?)+$/m.test(commandName))) {
+    callback(null, false);
+    return;
+  }
+  var child = exec('where ' + cleanedCommandName,
+    function (error) {
+      if (error !== null){
+        callback(null, false);
+      } else {
+        callback(null, true);
+      }
+    }
+  )
+}
+
+var commandExistsUnixSync = function(commandName, cleanedCommandName) {
+  if(fileNotExistsSync(commandName)){
+      try {
+        var stdout = execSync('command -v ' + cleanedCommandName +
+              ' 2>/dev/null' +
+              ' && { echo >&1 ' + cleanedCommandName + '; exit 0; }'
+              );
+        return !!stdout;
+      } catch (error) {
+        return false;
+      }
+  }
+  return localExecutableSync(commandName);
+}
+
+var commandExistsWindowsSync = function(commandName, cleanedCommandName, callback) {
+  // Regex from Julio from: https://stackoverflow.com/questions/51494579/regex-windows-path-validator
+  if (!(/^(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:"\|\?\*\n])+(?:\/\/|\/|\\\\|\\)?)+$/m.test(commandName))) {
+    return false;
+  }
+  try {
+      var stdout = execSync('where ' + cleanedCommandName, {stdio: []});
+      return !!stdout;
+  } catch (error) {
+      return false;
+  }
+}
+
+var cleanInput = function(s) {
+  if (/[^A-Za-z0-9_\/:=-]/.test(s)) {
+    s = "'"+s.replace(/'/g,"'\\''")+"'";
+    s = s.replace(/^(?:'')+/g, '') // unduplicate single-quote at the beginning
+      .replace(/\\'''/g, "\\'" ); // remove non-escaped single-quote if there are enclosed between 2 escaped
+  }
+  return s;
+}
+
+if (isUsingWindows) {
+  cleanInput = function(s) {
+    var isPathName = /[\\]/.test(s);
+    if (isPathName) {
+      var dirname = '"' + path.dirname(s) + '"';
+      var basename = '"' + path.basename(s) + '"';
+      return dirname + ':' + basename;
+    }
+    return '"' + s + '"';
+  }
+}
+
+module.exports = function commandExists(commandName, callback) {
+  var cleanedCommandName = cleanInput(commandName);
+  if (!callback && typeof Promise !== 'undefined') {
+    return new Promise(function(resolve, reject){
+      commandExists(commandName, function(error, output) {
+        if (output) {
+          resolve(commandName);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+  if (isUsingWindows) {
+    commandExistsWindows(commandName, cleanedCommandName, callback);
+  } else {
+    commandExistsUnix(commandName, cleanedCommandName, callback);
+  }
+};
+
+module.exports.sync = function(commandName) {
+  var cleanedCommandName = cleanInput(commandName);
+  if (isUsingWindows) {
+    return commandExistsWindowsSync(commandName, cleanedCommandName);
+  } else {
+    return commandExistsUnixSync(commandName, cleanedCommandName);
+  }
+};
+
+
+/***/ }),
+
 /***/ 357:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("assert");
 
 /***/ }),
@@ -1546,6 +1739,7 @@ module.exports = require("assert");
 /***/ 129:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("child_process");
 
 /***/ }),
@@ -1553,6 +1747,7 @@ module.exports = require("child_process");
 /***/ 614:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("events");
 
 /***/ }),
@@ -1560,6 +1755,7 @@ module.exports = require("events");
 /***/ 747:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("fs");
 
 /***/ }),
@@ -1567,6 +1763,7 @@ module.exports = require("fs");
 /***/ 87:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("os");
 
 /***/ }),
@@ -1574,6 +1771,7 @@ module.exports = require("os");
 /***/ 622:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("path");
 
 /***/ }),
@@ -1581,6 +1779,7 @@ module.exports = require("path");
 /***/ 669:
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("util");
 
 /***/ })

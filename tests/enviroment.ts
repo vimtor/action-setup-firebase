@@ -1,4 +1,4 @@
-import * as commandExists from 'command-exists';
+import commandExists from 'command-exists';
 
 test('environment variable was set correctly', () => {
   const token = process.env.FIREBASE_TOKEN;
@@ -8,9 +8,6 @@ test('environment variable was set correctly', () => {
   expect(token).toBe('banana');
 });
 
-test('firebase tools cli is installed', () => {
-  commandExists('firebase', (error, exists) => {
-    expect(error).toBeNull();
-    expect(exists).toBe(true);
-  });
+test('firebase tools cli is installed', async () => {
+  expect(await commandExists('firebase')).toBe('firebase');
 });
