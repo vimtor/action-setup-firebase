@@ -1,0 +1,13 @@
+name: Setup Firebase CLI
+description: Setup firebase-tools CLI
+author: Pocket Studios
+branding:
+  color: red
+  icon: terminal
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+inputs:
+  firebase-token:
+    required: true
+    description: Firebase token you can get by running `firebase login:ci`

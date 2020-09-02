@@ -1,0 +1,23 @@
+name: Publish
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: yarn install
+      - name: Run Action
+        uses: ./
+        with:
+          firebase-token: 'banana'
+      - name: Run Tests
+        run: yarn test
+      - name: Update Version
+        uses: pocket-studios/action-update-version@v1
+        with:
+          version-regexp: '\d'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,17 @@
+name: Node CI
+on:
+  push
+
+jobs:
+  node-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: yarn install
+      - name: Run Action
+        uses: ./
+        with:
+          firebase-token: 'banana'
+      - name: Run Tests
+        run: yarn test
