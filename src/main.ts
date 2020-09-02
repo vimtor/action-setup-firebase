@@ -15,7 +15,7 @@ const run = async () => {
     throw new Error('Missing mandatory input: firebase-token');
   }
 
-  await exec.exec('export', [`FIREBASE_TOKEN=${token}`]);
+  core.exportVariable('FIREBASE_TOKEN', token);
   await exec.exec('npm', ['install', '-g', 'firebase-tools']);
 };
 
