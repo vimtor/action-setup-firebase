@@ -1,11 +1,9 @@
 import { execSync } from 'child_process';
 import * as core from '@actions/core';
-import * as exec from '@actions/exec';
 import commandExists from 'command-exists';
 
-const installWithBash = async () => {
-  execSync('curl -sL https://firebase.tools | bash');
-};
+const installNpm = () => execSync('npm install -g firebase-tools');
+const installBash = () => execSync('curl -sL https://firebase.tools | bash');
 
 const run = async () => {
   const token = core.getInput('firebase-token');
@@ -22,15 +20,15 @@ const run = async () => {
     core.info('Detected NPM installation');
     try {
       core.info('Trying to install firebase-tools using NPM');
-      await exec.exec('npm', ['install', '-g', 'firebase-tools']);
+      installNpm();
     } catch (e) {
       core.info('Installation failed through NPM (maybe you forgot actions/setup-node before this action)');
       core.info('Trying BASH instead');
-      await installWithBash();
+      installBash();
     }
   } else if (os === 'Linux' || os === 'macOS') {
     core.info('Trying to install firebase-tools using BASH');
-    await installWithBash();
+    installBash();
   } else if (os === 'Windows') {
     throw new Error('On windows you must setup node before running this action');
   }
