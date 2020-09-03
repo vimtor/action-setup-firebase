@@ -2,8 +2,9 @@
    <h1>🔥 setup-firebase</h1>
    <p>Setup firebase-tools CLI for multiple steps</p>
    <p align="center">
-    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/pocket-studios/action-setup-firebase/ci">
+    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/pocket-studios/action-setup-firebase/CI">
     <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/pocket-studios/action-setup-firebase">
+    <img alt="GitHub" src="https://img.shields.io/github/license/pocket-studios/action-update-version">
    </p>
 </div>
 
