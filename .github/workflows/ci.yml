@@ -20,6 +20,8 @@ jobs:
         if: ${{ matrix.node == 'with-node' }}
       - name: Install Dependencies
         run: yarn install
+      - name: Build Package
+        run: yarn build
       - name: Run Action
         uses: ./
         with:
