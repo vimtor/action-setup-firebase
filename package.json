@@ -1,6 +1,6 @@
 {
   "name": "action-setup-firebase",
-  "version": "0",
+  "version": "1",
   "description": "Setup firebase tools CLI",
   "main": "lib/main.js",
   "scripts": {
