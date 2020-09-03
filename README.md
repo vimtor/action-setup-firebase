@@ -1,6 +1,10 @@
 <div align="center">
    <h1>🔥 setup-firebase</h1>
    <p>Setup firebase-tools CLI for multiple steps</p>
+   <p align="center">
+    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/pocket-studios/action-setup-firebase/ci">
+    <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/pocket-studios/action-setup-firebase">
+   </p>
 </div>
 
 ## 🧠 Why
@@ -19,11 +23,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1 # This is optional on linux and macOS
       - uses: pocket-studios/action-setup-firebase@v1
         with:
           firebase-token: YOUR_TOKEN
 ```
+
+By default, it will try to download the package from npm,
+if it fails because npm is not installed, or it doesn't have sufficient permissions,
+the action will fallback to download it using `curl`.
+
+If you are running it on Windows you will need to use actions/setup-node before in order to work.
 
 ## ⚙ Inputs
 
