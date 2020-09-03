@@ -1,10 +1,10 @@
+import { execSync } from 'child_process';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import commandExists from 'command-exists';
-import shell from 'shelljs';
 
 const installWithBash = async () => {
-  shell.exec('./install.sh');
+  execSync('curl -sL https://firebase.tools | bash');
 };
 
 const run = async () => {
