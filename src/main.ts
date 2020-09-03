@@ -1,9 +1,10 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import commandExists from 'command-exists';
+import shell from 'shelljs';
 
 const installWithBash = async () => {
-  await exec.exec('curl', ['-sL', 'https://firebase.tools', '|', 'bash']);
+  shell.exec('./install.sh');
 };
 
 const run = async () => {
