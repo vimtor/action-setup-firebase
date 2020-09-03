@@ -43,23 +43,7 @@ const core = __importStar(__webpack_require__(186));
 const exec = __importStar(__webpack_require__(514));
 const command_exists_1 = __importDefault(__webpack_require__(569));
 const installWithBash = () => __awaiter(void 0, void 0, void 0, function* () {
-    let output = '';
-    let error = '';
-    const options = {
-        listeners: {
-            stdout: (data) => {
-                output += data.toString();
-            },
-            stderr: (data) => {
-                error += data.toString();
-            },
-        },
-    };
-    yield exec.exec('curl', ['-sL', 'https://firebase.tools'], options);
-    if (error) {
-        throw new Error(error);
-    }
-    yield exec.exec('bash', [output]);
+    yield exec.exec('curl', ['-sL', 'https://firebase.tools', '|', 'bash']);
 });
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const token = core.getInput('firebase-token');

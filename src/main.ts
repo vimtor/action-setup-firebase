@@ -3,27 +3,7 @@ import * as exec from '@actions/exec';
 import commandExists from 'command-exists';
 
 const installWithBash = async () => {
-  let output = '';
-  let error = '';
-
-  const options = {
-    listeners: {
-      stdout: (data: Buffer) => {
-        output += data.toString();
-      },
-      stderr: (data: Buffer) => {
-        error += data.toString();
-      },
-    },
-  };
-
-  await exec.exec('curl', ['-sL', 'https://firebase.tools'], options);
-
-  if (error) {
-    throw new Error(error);
-  }
-
-  await exec.exec('bash', [output]);
+  await exec.exec('curl', ['-sL', 'https://firebase.tools', '|', 'bash']);
 };
 
 const run = async () => {
