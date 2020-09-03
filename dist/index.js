@@ -42,6 +42,25 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(186));
 const exec = __importStar(__webpack_require__(514));
 const command_exists_1 = __importDefault(__webpack_require__(569));
+const installWithBash = () => __awaiter(void 0, void 0, void 0, function* () {
+    let output = '';
+    let error = '';
+    const options = {
+        listeners: {
+            stdout: (data) => {
+                output += data.toString();
+            },
+            stderr: (data) => {
+                error += data.toString();
+            },
+        },
+    };
+    yield exec.exec('curl', ['-sL', 'https://firebase.tools'], options);
+    if (error) {
+        throw new Error(error);
+    }
+    yield exec.exec('bash', [output]);
+});
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     core.info(` Available environment variables:\n -> ${Object.keys(process.env)
         .map(i => `${i} :: ${process.env[i]}`)
@@ -53,18 +72,29 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error('Missing mandatory input: firebase-token');
     }
     core.exportVariable('FIREBASE_TOKEN', token);
+    core.info('Exported environment variable FIREBASE_TOKEN');
     if (yield command_exists_1.default('npm')) {
-        yield exec.exec('npm', ['install', '-g', 'firebase-tools']);
+        core.info('Detected NPM installation');
+        try {
+            core.info('Trying to install firebase-tools using NPM');
+            yield exec.exec('npm', ['install', '-g', 'firebase-tools']);
+        }
+        catch (e) {
+            core.info('Installation failed through NPM (maybe you forgot actions/setup-node before this action)');
+            core.info('Trying BASH instead');
+            yield installWithBash();
+        }
     }
-    else if (os === 'Linux') {
-        yield exec.exec('curl', ['-sL', 'https://firebase.tools', '|', 'bash']);
+    else if (os === 'Linux' || os === 'macOS') {
+        core.info('Trying to install firebase-tools using BASH');
+        yield installWithBash();
     }
-    else {
-        throw new Error('On windows you need to setup node before');
+    else if (os === 'Windows') {
+        throw new Error('On windows you must setup node before running this action');
     }
 });
 run()
-    .then(() => core.info('Updated files version successfully'))
+    .then(() => core.info('Successfully installed firebase-tools CLI'))
     .catch(error => core.setFailed(error.message));
 
 
