@@ -8,16 +8,16 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        node: [yes, no]
+        node: [with-node, without-node]
         exclude:
           - os: windows-latest
-            node: no
+            node: without-node
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v1
-        if: ${{ matrix.node }}
+        if: ${{ matrix.node == 'with-node' }}
       - name: Install Dependencies
         run: yarn install
       - name: Run Action
