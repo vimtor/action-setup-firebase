@@ -27,13 +27,6 @@ const installWithBash = async () => {
 };
 
 const run = async () => {
-  core.info(
-    ` Available environment variables:\n -> ${Object.keys(process.env)
-      .map(i => `${i} :: ${process.env[i]}`)
-      .join('\n -> ')}`,
-  );
-
-  core.info('Setting input and environment variables');
   const token = core.getInput('firebase-token');
   const os = process.env.RUNNER_OS;
 
