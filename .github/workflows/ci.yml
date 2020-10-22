@@ -1,6 +1,5 @@
 name: CI
-on:
-  push
+on: push
 
 jobs:
   ci:
@@ -20,6 +19,10 @@ jobs:
         if: ${{ matrix.node == 'with-node' }}
       - name: Install Dependencies
         run: yarn install
+      - name: Run Linters
+        run: yarn lint
+      - name: Format Check
+        run: yarn format
       - name: Build Package
         run: yarn build
       - name: Run Action

@@ -10,7 +10,8 @@
 
 ## 🧠 Why
 
-There is an excellent action already: [firebase-action](https://github.com/w9jds/firebase-action), but it forces you to run a command in order to work.
+There is an excellent action already: [firebase-action](https://github.com/w9jds/firebase-action), but it forces you to
+run a command in order to work.
 
 With this one, after running the action you can use the firebase-tools CLI from anywhere: npm script, shell...
 
@@ -30,17 +31,16 @@ jobs:
           firebase-token: YOUR_TOKEN
 ```
 
-By default, it will try to download the package from npm,
-if it fails because npm is not installed, or it doesn't have sufficient permissions,
-the action will fallback to download it using `curl`.
+By default, it will try to download the package from npm, if it fails because npm is not installed, or it doesn't have
+sufficient permissions, the action will fallback to download it using `curl`.
 
 If you are running it on Windows you will need to use actions/setup-node before in order to work.
 
 ## ⚙ Inputs
 
-**Name**|**Description**|**Required**
------|-----|-----
-firebase-token|Firebase token you can get by running `firebase login:ci`|✔
+| **Name**       | **Description**                                           | **Required** |
+| -------------- | --------------------------------------------------------- | ------------ |
+| firebase-token | Firebase token you can get by running `firebase login:ci` | ✔            |
 
 ## 👋 Support
 
