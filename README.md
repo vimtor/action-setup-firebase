@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1 # This is optional on linux and macOS
-      - uses: pocket-studios/action-setup-firebase@v1
+      - uses: pocket-studios/action-setup-firebase@v2
         with:
           firebase-token: YOUR_TOKEN
 ```
