@@ -9,5 +9,5 @@ runs:
   main: 'dist/index.js'
 inputs:
   firebase-token:
-    required: true
+    required: false
     description: Firebase token you can get by running `firebase login:ci`
